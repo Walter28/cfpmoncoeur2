@@ -8,10 +8,8 @@ RUN apt-get update && apt-get install -y \
     git \
     unzip \
     zip \
-    nginx \
     curl \
     libpq-dev \
-    supervisor \
     && rm -rf /var/lib/apt/lists/*
 
 # Install PHP extensions
@@ -43,18 +41,21 @@ RUN php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache
 
-# Configure Nginx
-RUN rm /etc/nginx/sites-enabled/default
-COPY nginx.conf /etc/nginx/sites-available/default
-RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+# Install Caddy
+RUN curl -1sLf 'https://dl.caddy.community/linux/caddy_linux_amd64.tar.gz' | tar -xz -C /usr/local/bin/
 
-# Configure supervisord
-RUN mkdir -p /var/log/supervisor
-COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+# Create Caddyfile
+RUN echo ':80 { \
+    root * /app/public \
+    encode gzip \
+    try_files {path} {path}/ /index.php?{query} \
+    php_fastcgi localhost:9000 \
+    file_server \
+}' > /etc/Caddyfile
 
 # Expose port
 EXPOSE 80
 
-# Start supervisord
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# Start PHP-FPM and Caddy
+CMD ["sh", "-c", "php-fpm -D && caddy run --config /etc/Caddyfile"]
 
