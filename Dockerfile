@@ -43,24 +43,16 @@ RUN php artisan config:cache && \
     php artisan view:cache
 
 # Configure Nginx
-RUN rm /etc/nginx/sites-enabled/default && \
-    echo 'server { \
-    listen 80; \
-    server_name _; \
-    root /app/public; \
-    index index.php; \
-    location / { \
-        try_files $uri $uri/ /index.php?$query_string; \
-    } \
-    location ~ \.php$ { \
-        fastcgi_pass 127.0.0.1:9000; \
-        fastcgi_index index.php; \
-        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name; \
-        include fastcgi_params; \
-    } \
-}' > /etc/nginx/sites-available/default && \
-    ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+RUN rm /etc/nginx/sites-enabled/default
+COPY nginx.conf /etc/nginx/sites-available/default
+RUN ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
+
+# Create startup script
+RUN echo '#!/bin/sh\nphp-fpm -D\nnginx -g "daemon off;"' > /start.sh && chmod +x /start.sh
+
+# Expose port
+EXPOSE 80
 
 # Start both PHP-FPM and Nginx
-CMD ["sh", "-c", "php-fpm -D && nginx -g \"daemon off;\""]
+CMD ["/start.sh"]
 
