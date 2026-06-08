@@ -36,6 +36,9 @@ RUN php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache
 
-# Start command
-CMD ["/start-container.sh"]
+# Expose port
+EXPOSE 80
+
+# Start FrankenPHP
+CMD ["frankenphp", "run", "--bind=0.0.0.0:80"]
 
