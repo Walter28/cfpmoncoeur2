@@ -36,10 +36,11 @@ RUN php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache
 
-# Create Caddyfile for FrankenPHP
+# Create Caddyfile for Laravel
 RUN echo ':80 { \
     root * /app/public \
     encode gzip \
+    try_files {path} {path}/ /index.php?{query} \
     php_fastcgi localhost:9000 \
     file_server \
 }' > /etc/caddy/Caddyfile
@@ -47,6 +48,6 @@ RUN echo ':80 { \
 # Expose port
 EXPOSE 80
 
-# Start FrankenPHP with Caddy
+# Start FrankenPHP
 CMD ["frankenphp", "run"]
 
