@@ -1,7 +1,0 @@
-[php]
-version = "8.4"
-
-[[build.steps]]
-name = "composer-install"
-run = "composer install --optimize-autoloader --no-scripts --no-interaction"
-
