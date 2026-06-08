@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:php8.4.22-bookworm
+FROM php:8.4-fpm-bookworm
 
 WORKDIR /app
 
@@ -8,7 +8,12 @@ RUN apt-get update && apt-get install -y \
     git \
     unzip \
     zip \
+    nginx \
+    curl \
     && rm -rf /var/lib/apt/lists/*
+
+# Install PHP extensions
+RUN docker-php-ext-install pdo pdo_pgsql
 
 # Copy composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -36,18 +41,25 @@ RUN php artisan config:cache && \
     php artisan route:cache && \
     php artisan view:cache
 
-# Create Caddyfile for Laravel
-RUN echo ':80 { \
-    root * /app/public \
-    encode gzip \
-    try_files {path} {path}/ /index.php?{query} \
-    php_fastcgi localhost:9000 \
-    file_server \
-}' > /etc/caddy/Caddyfile
+# Configure Nginx
+RUN rm /etc/nginx/sites-enabled/default && \
+    echo 'server { \
+    listen 80; \
+    server_name _; \
+    root /app/public; \
+    index index.php; \
+    location / { \
+        try_files $uri $uri/ /index.php?$query_string; \
+    } \
+    location ~ \.php$ { \
+        fastcgi_pass 127.0.0.1:9000; \
+        fastcgi_index index.php; \
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name; \
+        include fastcgi_params; \
+    } \
+}' > /etc/nginx/sites-available/default && \
+    ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
-# Expose port
-EXPOSE 80
-
-# Start FrankenPHP
-CMD ["frankenphp", "run"]
+# Start both PHP-FPM and Nginx
+CMD ["sh", "-c", "php-fpm -D && nginx -g \"daemon off;\""]
 
