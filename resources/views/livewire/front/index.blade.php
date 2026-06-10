@@ -728,7 +728,7 @@
                 ]; @endphp
                 @foreach($faqs as $i => $f)
                 <div class="faq-item" id="faq{{ $i }}">
-                    <button class="faq-question" onclick="cfpFaqToggle({{ $i }})">
+                    <button class="faq-question" type="button" data-index="{{ $i }}">
                         {{ $f['q'] }}<i class="bi bi-chevron-down faq-chevron"></i>
                     </button>
                     <div class="faq-answer">{{ $f['a'] }}</div>
@@ -746,5 +746,14 @@ function cfpFaqToggle(i) {
     document.querySelectorAll('.faq-item').forEach(function(el){ el.classList.remove('open'); });
     if (!isOpen) item.classList.add('open');
 }
+// attach click handlers without inline Blade in attributes
+document.addEventListener('DOMContentLoaded', function(){
+    document.querySelectorAll('.faq-question').forEach(function(btn){
+        btn.addEventListener('click', function(){
+            var i = this.dataset.index;
+            cfpFaqToggle(i);
+        });
+    });
+});
 </script>
 </div>
