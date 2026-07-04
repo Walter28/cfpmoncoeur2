@@ -24,6 +24,9 @@ Route::get('/acceuil', Index::class)->name('acceuil');
 Route::get('/about', About::class)->name('about');
 Route::get('/contact', Contact::class)->name('contact');
 Route::get('/formations/{id}', FormationDetail::class)->name('formation.detail');
+Route::get('/faire-don', function () {
+    return view('dons-public');
+})->name('faire.don');
 
 // ── Catalogue public des formations ──
 Route::get('/nos-formations', FormationsListe::class)

@@ -16,6 +16,7 @@
             <a href="{{ route('acceuil') }}" class="cfp-nav-link {{ request()->routeIs('acceuil') ? 'cfp-nav-active' : '' }}">Accueil</a>
             <a href="{{ route('nos-formations') }}" class="cfp-nav-link {{ request()->routeIs('nos-formations') ? 'cfp-nav-active' : '' }}">Formations</a>
             <a href="{{ route('about') }}" class="cfp-nav-link {{ request()->routeIs('about') ? 'cfp-nav-active' : '' }}">À propos</a>
+            <a href="{{ route('faire.don') }}" class="cfp-nav-link {{ request()->routeIs('faire.don') ? 'cfp-nav-active' : '' }}">Faire un don</a>
             <a href="{{ route('contact') }}" class="cfp-nav-link {{ request()->routeIs('contact') ? 'cfp-nav-active' : '' }}">Contact</a>
         </div>
 

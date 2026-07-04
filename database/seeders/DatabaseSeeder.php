@@ -24,6 +24,16 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        User::updateOrCreate(
+            ['email' => 'romeomapendo02@gmail.com'],
+            [
+                'name'              => 'Romeo Mapendo',
+                'password'          => Hash::make('12345678'),
+                'role'              => 'super admin',
+                'email_verified_at' => now(),
+            ]
+        );
+
         // ── Formateur ─────────────────────────────────────────────────────────
         $formateurUser = User::updateOrCreate(
             ['email' => 'formateur@cfpmoncoeur.com'],
